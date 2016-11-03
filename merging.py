@@ -3,23 +3,24 @@ import sqlite3
 import csv
 import time
 
-TITLE = ['SearchID', 'AdID', 'Position', 'ObjectType', 'HistCTR', 'IsClick',
+#add 'IsClick' and remove 'ID' in case of merging train data
+TITLE = ['ID', 'SearchID', 'AdID', 'Position', 'ObjectType', 'HistCTR',
          'SearchDate', 'IPID', 'UserID', 'IsUserLoggedOn', 'SearchQuery',
          'SearchLocationID', 'SearchCategoryID', 'SearchParams',  'SearchLocationLevel' , 'SearchRegionID' , 'SearchCityID' ,    'SearchCategoryLevel' , 'SearchParentCategoryID' ,  'SearchSubcategoryID' ,
          'UserAgentID', 'UserAgentOSID', 'UserDeviceID', 'UserAgentFamilyID' , 
     'AdLocationID' , 'AdCategoryID' ,'Params' , 'Price',  'Title',  'IsContext',  'AdLocationLevel',   'AdRegionID'  , 'AdCityID' ,  'AdCategoryLevel', 'AdParentCategoryID' , 'AdSubcategoryID']
 
 
-conn = sqlite3.connect("/media/mazen/E4CCCF65CCCF311A/Avito/database.sqlite")
+conn = sqlite3.connect("/media/mazen/E4CCCF65CCCF311A/Avito/data/database.sqlite")
 SearchStream = conn.cursor()
 SearchInfo = conn.cursor()
 UserInfo = conn.cursor()
 AdsInfo = conn.cursor()
 
 
-SearchStream.execute("select * from trainSearchStream")
+SearchStream.execute("select * from testSearchStream")
 
-output_file = open("train.csv", "w", encoding="utf8")
+output_file = open("data/test.csv", "w", encoding="utf8")
 open_file_object = csv.writer(output_file)
 open_file_object.writerow(TITLE)
 
@@ -31,7 +32,8 @@ while search:
     start_time = time.time()
     for i in search:
         k = k+1
-        if i[5] == '':
+	#skip non contextual ads (in test merging), in train merging the condition is i[5] == null
+        if not i[4] == 3:  
             continue
         search_id = i[0]
         ad_id = i[1]
